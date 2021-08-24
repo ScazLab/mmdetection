@@ -160,7 +160,9 @@ def imshow_det_bboxes(img,
             mask = segms[i].astype(bool)
             img[mask] = img[mask] * 0.5 + color_mask * 0.5
 
-    plt.imshow(img)
+    #plt.imshow(img)
+    print("saving")
+    plt.imsave('Result/out%d.png')
 
     p = PatchCollection(
         polygons, facecolor='none', edgecolors=color, linewidths=thickness)
