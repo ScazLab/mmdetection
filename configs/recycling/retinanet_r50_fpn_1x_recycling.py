@@ -7,4 +7,6 @@ _base_ = [
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 
 # num_classes
-model = dict(bbox_head = dict(num_classes=2))
+model = dict(bbox_head = dict(num_classes=2),
+             test_cfg = dict(min_bbox_size=40,
+                             nms=dict(type='fast-nms', iou_threshold=0.5)))
