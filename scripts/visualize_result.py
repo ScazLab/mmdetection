@@ -57,10 +57,11 @@ def main(args):
             confidence = bbox[4]
             box_length = bbox[2]-bbox[0]
             box_width = bbox[3]-bbox[1]
-            
-            if box_length >= args.min_box_length and box_width >= args.max_box_length: # check for very small boxes
-                if box_length <= args.max_box_length and box_width <= args.max_box_width: # check for very large boxes
-                    if bbox[1] > args.y_min and bbox[3] < args.y_max: # check for boxes predicted outside the conveyor belt
+            #print(bbox)
+             
+            if box_length >= int(args.min_box_length) and box_width >= int(args.min_box_width): # check for very small boxes
+                if box_length <= int(args.max_box_length) and box_width <= int(args.max_box_width): # check for very large boxes
+                    if bbox[1] > int(args.y_min) and bbox[3] < int(args.y_max): # check for boxes predicted outside the conveyor belt
                         print(box_length, box_width, confidence)
                         crop_list.append([start_point, end_point])
                         image = cv2.rectangle(image, start_point, end_point, color=(0,255,0), thickness=3)
