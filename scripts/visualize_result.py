@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
 import cv2
 import os
 import math
@@ -27,8 +28,6 @@ def parse_args():
         '--max-box-length', type=int, default=800, help='maximum length of predicted box to consider')
     parser.add_argument(
         '--max-box-width', type=int, default=500, help='maximum width of predicted box to consider')
-    parser.add_argument(
-        '--min-box-length', type=int, default=30, help='minimum length of predicted box to consider')
     parser.add_argument(
         '--y-min', type=int, default=100, help='y coordinate of the top of the conveyor belt')
     parser.add_argument(
