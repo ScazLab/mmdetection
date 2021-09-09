@@ -71,6 +71,7 @@ def CSV2JSON(args):
             # obtain axis-aligned bbox from polygon
             x0, y0, x1, y1 = polygon.bounds
             bbox = [int(x0), int(y0), int(x1 - x0), int(y1 - y0)]
+            bbox_area = (x1 - x0) * (y1 - y0)
             #print(filename, image_id, instance_id, bbox, polygon, cat, cat_id)
             
             # IMPORTANT: Check for Multipolygons. If found, correct annotations. 
@@ -81,8 +82,9 @@ def CSV2JSON(args):
             ann_dict["id"] = instance_id
             ann_dict["image_id"] = image_id
             ann_dict["category_id"] = cat_id
-            ann_dict["segmentation"] = list(polygon.exterior.coords)
+            ann_dict["segmentation"] = [list(itertools.chain(*list(polygon.exterior.coords)))]
             ann_dict["bbox"] = bbox
+            ann_dict["area"] = bbox_area
             ann_dict_list.append(ann_dict)
             ann_dict = {}
             instance_id += 1

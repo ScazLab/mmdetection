@@ -58,7 +58,7 @@ def viz_dataset(args):
             masks = np.array(ann.segmentation)
             masks = masks.reshape((-1, 1, 2))
 
-            image = cv2.polylines(image, np.int32([masks[:, 0]]),isClosed=True, color=(255,0,0), thickness=5)
+            image = cv2.polylines(image, np.int32([masks]),isClosed=True, color=(255,0,0), thickness=5)
             
             cv2.putText(image,cat_mapping[class_id],start_point,cv2.FONT_HERSHEY_SIMPLEX,1,color=(255,255,0), thickness=2)
          
