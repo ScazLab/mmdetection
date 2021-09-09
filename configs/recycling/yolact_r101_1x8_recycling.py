@@ -22,6 +22,7 @@ train_pipeline = [
     dict(type='RandomCrop', crop_size=(720, 1280)),
     dict(type='Resize', img_scale=(720, 1280), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
+    #dict(type='Pad', size_divisor=32),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='DefaultFormatBundle'),
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks']),
@@ -30,15 +31,16 @@ test_pipeline = [
     dict(type='LoadImageFromFile',to_float32=True),
     dict(
         type='MultiScaleFlipAug',
-        scale_factor = (1.0),
-        #img_scale=(1280, 720),
+        #scale_factor = (1.0),
+        img_scale=(720, 1280),
         flip=False,
         transforms=[
-            dict(type='Resize', keep_ratio=True),
+            #dict(type='Resize', keep_ratio=True),
             #dict(type='RandomFlip'),
             dict(type='Normalize', **img_norm_cfg),
             dict(type='ImageToTensor', keys=['img']),
-            dict(type='DefaultFormatBundle'),
+            #dict(type='Pad', size_divisor=32),
+            #dict(type='DefaultFormatBundle'),
             dict(type='Collect', keys=['img']),
         ])
 ]
