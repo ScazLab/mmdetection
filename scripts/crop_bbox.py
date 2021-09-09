@@ -16,7 +16,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-def main(args):
+def bbox2crop(args):
     '''
     Expected JSON format: {'name_frameID:[[[x_min, y_min], [x_max, y_max]], [[x_min, y_min], [x_max, y_max]], ......]'}
     '''
@@ -45,4 +45,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
-    main(args)
+    bbox2crop(args)
