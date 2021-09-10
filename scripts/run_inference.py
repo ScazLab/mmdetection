@@ -49,8 +49,9 @@ def main(args):
         result = inference_detector(model, args.img + '/' + img)
         if args.mask_pred == True:
             # yolact
-            result_box_dict[img] = result[0][0].tolist()
-            result_mask_dict[img] = result[1][0][0].tolist()
+            print(np.shape(np.vstack((result[0][0], result[0][1], result[0][2], result[0][3])))) 
+            result_box_dict[img] = np.vstack((result[0][0], result[0][1], result[0][2], result[0][3])).tolist() #result[0][0].tolist()
+            #result_mask_dict[img] = result[1][0]
         else:
             # retinanet
             result_box_dict[img] = result[0].tolist()

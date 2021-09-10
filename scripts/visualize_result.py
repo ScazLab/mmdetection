@@ -21,17 +21,17 @@ def parse_args():
     parser.add_argument(
         '--mask-result-dir', type=str, default='', help='directory to store mask jsons')
     parser.add_argument(
-        '--min-box-length', type=int, default=30, help='minimum length of predicted box to consider')
+        '--min-box-length', type=int, default=5, help='minimum length of predicted box to consider')
     parser.add_argument(
-        '--min-box-width', type=int, default=30, help='minimum width of predicted box to consider')
+        '--min-box-width', type=int, default=5, help='minimum width of predicted box to consider')
     parser.add_argument(
-        '--max-box-length', type=int, default=800, help='maximum length of predicted box to consider')
+        '--max-box-length', type=int, default=1000, help='maximum length of predicted box to consider')
     parser.add_argument(
-        '--max-box-width', type=int, default=500, help='maximum width of predicted box to consider')
+        '--max-box-width', type=int, default=720, help='maximum width of predicted box to consider')
     parser.add_argument(
-        '--y-min', type=int, default=100, help='y coordinate of the top of the conveyor belt')
+        '--y-min', type=int, default=20, help='y coordinate of the top of the conveyor belt')
     parser.add_argument(
-        '--y-max', type=int, default=620, help='y coordinate of the bottom of the conveyor belt')
+        '--y-max', type=int, default=700, help='y coordinate of the bottom of the conveyor belt')
     args = parser.parse_args()
     return args
 

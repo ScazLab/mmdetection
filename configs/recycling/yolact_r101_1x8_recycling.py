@@ -12,7 +12,7 @@ model = dict(
     bbox_head=dict(num_classes=4),
     mask_head=dict(num_classes=4),
     segm_head=dict(num_classes=4),
-    test_cfg=dict(iou_thr=0.75))
+    test_cfg=dict(iou_thr=0.1))
 
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
