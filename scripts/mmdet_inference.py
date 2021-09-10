@@ -109,8 +109,61 @@ def convert_masks_to_rbbox(im_mask,bbox):
 def distance(x1,y1,x2,y2):
     return ((x1-x2)**2 + (y1-y2)**2)
 
-def run_inference():
-    pass
+def run_inference(model, image, num_classes):
+    all_bboxes = []
+    all_classes = []
+    all_scores = []
+    all_rboxes = []
+    all_im_masks = []
+
+    detections = inference_detector(model, image)
+    '''
+    detections have the following structure:
+    a. It is a tuple with 2 elements
+    b. element A: list of boxes, element B: list of masks
+    c. Each list has 4 elements, each element correponding to each of the 4 categories
+
+    (box_list, mask_list)
+    box_list: [cat_1, cat_2,...., cat_4]
+    mask_list: [cat_1, cat_2,...., cat_4]
+
+    box_list[0]: np.ndarray (N,5) --> N is the number of category_1 boxes
+    mask_list[0]: np.ndarray (N,720,1280) --> N is the number of category_1 masks
+
+    convert each mask in that numpy array to rotated bbox
+    '''
+    box_list, mask_list = detections[0], detections[1]
+
+    for cat_id in range(num_classes):
+        scores = list()
+        boxes, masks = box_list[cat_id], mask_list[cat_id]
+        if boxes.shape[0]==0:
+            continue
+        '''
+        Boxes shape: (N,5)
+        Masks shape: (N, 720, 1280)
+        N is the number of predictions for category cat_id for given image
+        '''
+    
+        scores = boxes[:,4]
+        # drop score from boxes and make it [x1,y1,x2,y2]
+        boxes = boxes[:,:4]
+    
+        classes = [cat_id + 1]*boxes.shape[0]
+        classes = np.array(classes)
+        
+        for index, mask in enumerate(masks): 
+             rbox = convert_masks_to_rbbox(mask,boxes[index])
+             if len(rbox)>0:
+                 for rb in rbox:
+                     rb = np.array(rb)
+                     all_rboxes.append(rb.tolist())
+
+        all_bboxes.extend(boxes.astype(int).tolist())
+        all_classes.extend(classes.tolist())
+        all_scores.extend(scores.tolist())
+    #print(all_bboxes, all_classes, all_scores, all_rboxes)
+    return (all_bboxes, all_classes, all_scores, all_rboxes)
 
 def main():
     # mask threshold dis used for binarizing the mask. This will determine the quality of the mask obtained 
@@ -122,25 +175,98 @@ def main():
 
     # Specify the path to model config and checkpoint file
     config_parent_path = '../configs/recycling/'
-    model_parent_path = '../checkpoints/'
+    model_parent_path = '../work_dirs/yolact_r101_1x8_recycling/'
 
     config_file = join(config_parent_path, 'yolact_r101_1x8_recycling.py')
     checkpoint_file = join(model_parent_path, "epoch_55.pth")
 
     # build the model from a config file and a checkpoint file
-    model = init_detector(config_file, checkpoint_file, device='gpu')
+    model = init_detector(config_file, checkpoint_file, device='cuda')
 
-    root = '/home/dg777/project/recycling/Data/'
+    root = '/home/dg777/project/recycling/Data/dense_mix/'
     test_data = '/home/dg777/project/recycling/Data/annotations/recycling_v1.json'
 
     with open(test_data,'r') as f:
         test_json = json.load(f)
-    print(test_json.keys())
+    #print(test_json.keys())
 
     annotations = pd.DataFrame.from_dict(test_json["annotations"])
     images = pd.DataFrame.from_dict(test_json["images"])
     categories = pd.DataFrame.from_dict(test_json["categories"])
+    
+    result_json = dict()
+    times = list()
+    count = 0
+    #print(len(images))
 
+    '''
+    Get predictions for every image - bbox, rbbox, class, scores
+    '''
+    for index,row in enumerate(images.itertuples()):
+        start_time = time.time()
+        print(count)
+        count = count + 1
+    
+        image_name = row.file_name
+        image_id = row.id
+        im_height = row.height
+        im_width = row.width
+        image_name_key = image_name.split('/')[-1].split('.')[0]
+        print("Image: ", root+image_name)
+   
+        image = load_image_into_numpy_array(root + image_name)
+        print("Input Size:", image.shape)
+
+        all_bboxes, all_classes, all_scores, all_rboxes = run_inference(model, image, num_classes)
+
+        '''
+        Process Ground Truth
+        '''
+        ann = annotations[annotations['image_id']==image_id]
+            
+        gt_boxes = list()
+        gt_classes = list()
+        gt_rbox = list()
+
+        for index,a_row in enumerate(ann.itertuples()):
+            #result_json = dict()
+            #print(a_row)
+            (xmin,ymin,xmax,ymax) = (a_row.bbox[0],a_row.bbox[1],a_row.bbox[0]+a_row.bbox[2],a_row.bbox[1]+a_row.bbox[3])
+            # Check if annotations exceed the bounds of the image 
+            if xmax > im_width:
+                xmax = im_width-1
+            if ymax > im_height:
+                ymax = im_height-1
+
+            new_box = [xmin,ymin,xmax,ymax]
+            gt_boxes.append(new_box) 
+            gt_classes.append(a_row.category_id)
+               
+            seg_xs = a_row.segmentation[0][0::2]
+            seg_ys = a_row.segmentation[0][1::2]
+
+            gt_seg = list()
+            for x,y in zip(seg_xs,seg_ys): 
+                gt_seg.append([int(x),int(y)])
+            gt_rbox.append(gt_seg)
+
+            result_json[image_name_key] = {
+                "detection_boxes": all_bboxes,
+                "detection_classes": all_classes,
+                "detection_scores": all_scores,
+                "detection_rboxes":all_rboxes,
+                "gt_boxes":gt_boxes,
+                "gt_classes": gt_classes,
+                "gt_count": len(gt_boxes),
+                "gt_rboxes": gt_rbox,
+            }
+            #print(result_json)
+            #result_json = dict()
+            #print(result_json)
+    json_file = 'overfit_dense_mix.json'
+    with open(json_file,'w') as f:
+        json.dump(result_json, f, indent=2)
+            #print(result_json['dense_mix_6'])
 
 if __name__ == '__main__':
     main()
