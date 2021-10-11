@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import itertools
 import pandas as pd
 import json
 from shapely.geometry import Polygon, MultiPolygon
@@ -57,6 +57,7 @@ def CSV2JSON(args):
         
         # map filename to unique ID
         filename = row.values[0]
+        print(filename)
         filename_list.append(filename)
         file_id_map = get_filename_idx_map(filename_list)
         image_id = file_id_map[filename]
@@ -76,7 +77,7 @@ def CSV2JSON(args):
             
             # IMPORTANT: Check for Multipolygons. If found, correct annotations. 
             if polygon.geom_type == 'MultiPolygon':
-                print(filename, instance_id, cat)
+                print(filename, instance_id, cat, row)
             
             # Create annotation dict for COCO JSON
             ann_dict["id"] = instance_id
@@ -121,6 +122,7 @@ def CSV2JSON(args):
     JSON_filename = args.json_save_path
     with open(JSON_filename, "w") as f:
         json.dump(COCO_JSON_dict, f)
+    print("COCO JSON Saved!!")
 
 if __name__ == '__main__':
     args = parse_args()
