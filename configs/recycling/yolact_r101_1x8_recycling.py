@@ -1,6 +1,6 @@
 _base_ = '../yolact/yolact_r50_1x8_coco.py'
 
-data_root = '/home/dg777/project/recycling/Data/'
+data_root = '/home/dg777/project/recycling/Recycling_Dataset/v2/'
 dataset_type = 'CocoDataset'
 classes = ('Can', 'Bottle', 'Milk Jug', 'Cardboard')
 
@@ -49,21 +49,21 @@ data = dict(
     workers_per_gpu=1,
     train=dict(
         type=dataset_type,
-        img_prefix=data_root + 'dense_mix/',
+        img_prefix=data_root + 'train/images/',
         classes=classes,
-        ann_file=data_root + 'annotations/recycling_v1.json',
+        ann_file=data_root + 'train/annotations/train.json',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        img_prefix=data_root + 'dense_mix/',
+        img_prefix=data_root + 'test/images/',
         classes=classes,
-        ann_file=data_root + 'annotations/recycling_v1.json',
+        ann_file=data_root + 'test/annotations/test.json',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        img_prefix=data_root + 'dense_mix/',
+        img_prefix=data_root + 'test/images/',
         classes=classes,
-        ann_file=data_root + 'annotations/recycling_v1.json',
+        ann_file=data_root + 'test/annotations/test.json',
         pipeline=test_pipeline))
 workflow = [('train', 1), ('val',1)]
 load_from = '/home/dg777/project/recycling/mmdetection/checkpoints/yolact_r101_1x8_coco_20200908-4cbe9101.pth'
