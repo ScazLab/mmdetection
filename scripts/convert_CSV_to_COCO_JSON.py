@@ -86,6 +86,7 @@ def CSV2JSON(args):
             ann_dict["segmentation"] = [list(itertools.chain(*list(polygon.exterior.coords)))]
             ann_dict["bbox"] = bbox
             ann_dict["area"] = bbox_area
+            ann_dict["iscrowd"] = 0
             ann_dict_list.append(ann_dict)
             ann_dict = {}
             instance_id += 1
