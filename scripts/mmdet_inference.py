@@ -178,13 +178,13 @@ def main():
     model_parent_path = '../work_dirs/yolact_r101_1x8_recycling/'
 
     config_file = join(config_parent_path, 'yolact_r101_1x8_recycling.py')
-    checkpoint_file = join(model_parent_path, "epoch_55.pth")
+    checkpoint_file = join(model_parent_path, "epoch_100.pth")
 
     # build the model from a config file and a checkpoint file
     model = init_detector(config_file, checkpoint_file, device='cuda')
 
-    root = '/home/dg777/project/recycling/Data/dense_mix/'
-    test_data = '/home/dg777/project/recycling/Data/annotations/recycling_v1.json'
+    root = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/images/'
+    test_data = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/annotations/test.json'
 
     with open(test_data,'r') as f:
         test_json = json.load(f)
@@ -263,7 +263,7 @@ def main():
             #print(result_json)
             #result_json = dict()
             #print(result_json)
-    json_file = 'overfit_dense_mix.json'
+    json_file = 'v2_test.json'
     with open(json_file,'w') as f:
         json.dump(result_json, f, indent=2)
             #print(result_json['dense_mix_6'])
