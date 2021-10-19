@@ -183,8 +183,11 @@ def main():
     # build the model from a config file and a checkpoint file
     model = init_detector(config_file, checkpoint_file, device='cuda')
 
-    root = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/images/'
-    test_data = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/annotations/test.json'
+    # root = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/images/'
+    # test_data = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/annotations/test.json'
+
+    root = '/home/scazlab/Recycling_Dataset/v2/test/images/'
+    test_data = '/home/scazlab/Recycling_Dataset/v2/test/annotations/test.json'
 
     with open(test_data,'r') as f:
         test_json = json.load(f)
