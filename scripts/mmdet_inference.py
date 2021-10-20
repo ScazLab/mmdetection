@@ -25,6 +25,8 @@ from os.path import join
 import time
 from copy import deepcopy
 
+NMS_THRESHOLD = 0.5
+
 def mask_to_polygons(mask):
         # cv2.RETR_CCOMP flag retrieves all the contours and arranges them to a 2-level
         # hierarchy. External contours (boundary) of the object are placed in hierarchy-1.
@@ -90,6 +92,14 @@ def convert_bbox_polygon(bbox):
     bl = (xmin, ymax)
     return [tl,tr,br,bl,tl]
 
+def convert_bbox_to_polygon(bbox):
+    xmin, ymin, xmax, ymax = bbox
+    tl = (xmin, ymin)
+    tr = (xmax, ymin)
+    br = (xmax, ymax)
+    bl = (xmin, ymax)
+    return Polygon([tl, tr, br, bl])
+
 def convert_masks_to_rbbox(im_mask,bbox):
     rbbox_list = list()
     rbbox, has_holes = mask_to_polygons(im_mask)
@@ -106,8 +116,67 @@ def convert_masks_to_rbbox(im_mask,bbox):
     #print(rbbox_list)
     return rbbox_list
 
+def convert_coords_to_polygon(rbox):
+    """Convert rotated bounding box to Polygon. Order of the coordinates is important
+    
+    Args:
+        rbox: (list) List of points of rotated bounding box coordinates
+        
+    Returns:
+        A Shapely Polygon object
+    """
+    return Polygon(rbox)
+
 def distance(x1,y1,x2,y2):
     return ((x1-x2)**2 + (y1-y2)**2)
+
+def nms_filter(scores, classes, boxes, nms_threshold, bbox_type):
+    """
+    NMS filter takes list of scores, classes and boxes as an input and
+    returns filter scores, classes and boxes.
+    """
+
+    def overlap(box1, box2):
+        try:
+            intersect_area = float(box1.intersection(box2).area) 
+            if intersect_area == 0.0:
+                return 0.0
+            return intersect_area / (box1.area + box2.area - intersect_area)
+        except Exception as e:
+            print(box1.area, box2.area, intersect_area)
+            print(e)
+            print(box1, box2)
+            return 0.0
+            
+    prediction_ids = list(range(len(scores)))
+    #print('boxes', boxes)
+    predictions = sorted(zip(prediction_ids, scores, classes, boxes), key=lambda x: x[1])
+    
+    if bbox_type == "axis":
+        # convert bbox to polygon
+        boxes_poly = [convert_bbox_to_polygon(box) for box in boxes]
+    else:
+        # rotated boxes
+        boxes_poly = [convert_coords_to_polygon(box) for box in boxes]
+  
+    
+    #boxes_poly = [Polygon(box) for box in boxes]
+    #print(predictions)
+    scores = []
+    classes = []
+    boxes = []
+    while len(predictions) > 0:
+        cur_id, cur_score, cur_class, cur_box = predictions.pop()
+        scores.append(cur_score)
+        classes.append(cur_class)
+        boxes.append(cur_box)
+        predictions = [x for x in predictions if overlap(boxes_poly[cur_id], boxes_poly[x[0]]) < nms_threshold]
+    
+    scores, classes, boxes = map(np.array, (scores, classes, boxes))
+    
+    #print(boxes, scores)
+    return scores, classes, boxes
+    
 
 def run_inference(model, image, num_classes):
     all_bboxes = []
@@ -153,16 +222,23 @@ def run_inference(model, image, num_classes):
         classes = np.array(classes)
         
         for index, mask in enumerate(masks): 
-             rbox = convert_masks_to_rbbox(mask,boxes[index])
-             if len(rbox)>0:
-                 for rb in rbox:
-                     rb = np.array(rb)
-                     all_rboxes.append(rb.tolist())
+            rbox = convert_masks_to_rbbox(mask,boxes[index])
+            if len(rbox)>0:
+                for rb in rbox:
+                    rb = np.array(rb)
+                    all_rboxes.append(rb.tolist())
+            else:
+                all_rboxes.append(boxes[index])
 
         all_bboxes.extend(boxes.astype(int).tolist())
         all_classes.extend(classes.tolist())
         all_scores.extend(scores.tolist())
     #print(all_bboxes, all_classes, all_scores, all_rboxes)
+
+    # filtered_scores, filtered_classes, filtered_bboxes =  nms_filter(all_scores, all_classes, all_bboxes, NMS_THRESHOLD, bbox_type='axis')
+    # filtered_scores, filtered_classes, filtered_rboxes = nms_filter(all_scores, all_classes, all_rboxes, NMS_THRESHOLD, bbox_type='rotated')
+    # print(filtered_rboxes, filtered_classes, filtered_scores)
+
     return (all_bboxes, all_classes, all_scores, all_rboxes)
 
 def main():
@@ -263,10 +339,10 @@ def main():
                 "gt_count": len(gt_boxes),
                 "gt_rboxes": gt_rbox,
             }
-            #print(result_json)
+            # print(result_json)
             #result_json = dict()
             #print(result_json)
-    json_file = 'v2_test.json'
+    json_file = 'v2_test1.json'
     with open(json_file,'w') as f:
         json.dump(result_json, f, indent=2)
             #print(result_json['dense_mix_6'])

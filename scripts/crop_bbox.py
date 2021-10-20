@@ -5,7 +5,8 @@ import os
 import re
 from argparse import ArgumentParser
 
-score_threshold_dict =  {1: 0.5126, 2: 0.8644, 3: 0.1859, 4: 0.1859}
+# score_threshold_dict =  {1: 0.5126, 2: 0.8644, 3: 0.1859, 4: 0.1859} # v2_test.json
+score_threshold_dict =  {1: 0.5126, 2: 0.8644, 3: 0.8141, 4: 0.2110} # v2_train_overfit.json
 
 def parse_args():
     parser = ArgumentParser()
