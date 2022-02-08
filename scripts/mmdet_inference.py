@@ -262,8 +262,8 @@ def main():
     # root = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/images/'
     # test_data = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/annotations/test.json'
 
-    root = '/home/scazlab/Recycling_Dataset/v2/test/images/'
-    test_data = '/home/scazlab/Recycling_Dataset/v2/test/annotations/test.json'
+    root = '/home/scazlab/Recycling_Dataset/v3/test/images/'
+    test_data = '/home/scazlab/Recycling_Dataset/v3/test/annotations/test.json'
 
     with open(test_data,'r') as f:
         test_json = json.load(f)
@@ -342,7 +342,7 @@ def main():
             # print(result_json)
             #result_json = dict()
             #print(result_json)
-    json_file = 'v2_test1.json'
+    json_file = 'v3_test.json'
     with open(json_file,'w') as f:
         json.dump(result_json, f, indent=2)
             #print(result_json['dense_mix_6'])
