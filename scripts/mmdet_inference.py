@@ -244,16 +244,16 @@ def run_inference(model, image, num_classes):
 def main():
     # mask threshold dis used for binarizing the mask. This will determine the quality of the mask obtained 
     mask_threshold = 0.5  
-    num_classes = 4
+    num_classes = 8
 
     # exp_name
     #exp_name = "baseline_exp/"
 
     # Specify the path to model config and checkpoint file
-    config_parent_path = '../configs/recycling/'
-    model_parent_path = '../work_dirs/yolact_r101_1x8_recycling/'
+    config_parent_path = '../configs/hide_and_seek/'
+    model_parent_path = '/home/debasmita/catkin_ws/src/hide_and_seek/hr_hide_seek/models/robot_detection'
 
-    config_file = join(config_parent_path, 'yolact_r101_1x8_recycling.py')
+    config_file = join(config_parent_path, 'yolact_r101_1x8_robot_detection.py')
     checkpoint_file = join(model_parent_path, "epoch_100.pth")
 
     # build the model from a config file and a checkpoint file
@@ -262,8 +262,8 @@ def main():
     # root = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/images/'
     # test_data = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/annotations/test.json'
 
-    root = '/home/scazlab/Recycling_Dataset/v3/test/images/'
-    test_data = '/home/scazlab/Recycling_Dataset/v3/test/annotations/test.json'
+    root = '/home/debasmita/catkin_ws/src/hide_and_seek/hr_hide_seek/data/robot_detection_images/all_images/'
+    test_data = '/home/debasmita/catkin_ws/src/hide_and_seek/hr_hide_seek/data/robot_detection_annotations/coco_json_heading_all.json'
 
     with open(test_data,'r') as f:
         test_json = json.load(f)
@@ -285,7 +285,7 @@ def main():
         start_time = time.time()
         print(count)
         count = count + 1
-    
+        # import pdb; pdb.set_trace()
         image_name = row.file_name
         image_id = row.id
         im_height = row.height
@@ -342,7 +342,7 @@ def main():
             # print(result_json)
             #result_json = dict()
             #print(result_json)
-    json_file = 'v3_test.json'
+    json_file = 'heading_test.json'
     with open(json_file,'w') as f:
         json.dump(result_json, f, indent=2)
             #print(result_json['dense_mix_6'])
