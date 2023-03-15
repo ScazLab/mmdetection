@@ -251,7 +251,7 @@ def main():
 
     # Specify the path to model config and checkpoint file
     config_parent_path = '../configs/hide_and_seek/'
-    model_parent_path = '/home/debasmita/catkin_ws/src/hide_and_seek/hr_hide_seek/models/robot_detection'
+    model_parent_path = '~/catkin_ws/src/hide_and_seek/hr_hide_seek/models/robot_detection'
 
     config_file = join(config_parent_path, 'yolact_r101_1x8_robot_detection.py')
     checkpoint_file = join(model_parent_path, "epoch_100.pth")
@@ -262,8 +262,8 @@ def main():
     # root = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/images/'
     # test_data = '/home/dg777/project/recycling/Recycling_Dataset/v2/test/annotations/test.json'
 
-    root = '/home/debasmita/catkin_ws/src/hide_and_seek/hr_hide_seek/data/robot_detection_images/all_images/'
-    test_data = '/home/debasmita/catkin_ws/src/hide_and_seek/hr_hide_seek/data/robot_detection_annotations/coco_json_heading_all.json'
+    root = '~/catkin_ws/src/hide_and_seek/hr_hide_seek/data/robot_detection_images/all_images/'
+    test_data = '~/catkin_ws/src/hide_and_seek/hr_hide_seek/data/robot_detection_annotations/coco_json_heading_all.json'
 
     with open(test_data,'r') as f:
         test_json = json.load(f)
