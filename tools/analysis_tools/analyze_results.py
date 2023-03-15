@@ -63,7 +63,7 @@ class ResultVisualizer:
 
     def _save_image_gts_results(self, dataset, results, mAPs, out_dir=None):
         mmcv.mkdir_or_exist(out_dir)
-
+        
         for mAP_info in mAPs:
             index, mAP = mAP_info
             data_info = dataset.prepare_train_img(index)
@@ -76,7 +76,18 @@ class ResultVisualizer:
                 filename = data_info['filename']
             fname, name = osp.splitext(osp.basename(filename))
             save_filename = fname + '_' + str(round(mAP, 3)) + name
+            # import pdb; pdb.set_trace()
             out_file = osp.join(out_dir, save_filename)
+            try:
+                if len(data_info['gt_labels']) > 0:
+                    gt = data_info['gt_labels'][0]
+                    print(save_filename, 'GT: ', dataset.CLASSES[gt])
+            except:
+                print(data_info)
+                import pdb; pdb.set_trace()
+                IndexError
+            
+            
             imshow_gt_det_bboxes(
                 data_info['img'],
                 data_info,
@@ -104,7 +115,7 @@ class ResultVisualizer:
                 Default: 'work_dir'
             eval_fn (callable, optional): Eval function, Default: None
         """
-
+        
         assert topk > 0
         if (topk * 2) > len(dataset):
             topk = len(dataset) // 2
@@ -117,6 +128,7 @@ class ResultVisualizer:
         prog_bar = mmcv.ProgressBar(len(results))
         _mAPs = {}
         for i, (result, ) in enumerate(zip(results)):
+            
             # self.dataset[i] should not call directly
             # because there is a risk of mismatch
             data_info = dataset.prepare_train_img(i)
@@ -128,7 +140,7 @@ class ResultVisualizer:
         _mAPs = list(sorted(_mAPs.items(), key=lambda kv: kv[1]))
         good_mAPs = _mAPs[-topk:]
         bad_mAPs = _mAPs[:topk]
-
+        
         good_dir = osp.abspath(osp.join(show_dir, 'good'))
         bad_dir = osp.abspath(osp.join(show_dir, 'bad'))
         self._save_image_gts_results(dataset, results, good_mAPs, good_dir)

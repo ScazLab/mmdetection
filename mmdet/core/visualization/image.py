@@ -87,7 +87,7 @@ def imshow_det_bboxes(img,
         labels = labels[inds]
         if segms is not None:
             segms = segms[inds, ...]
-
+    
     mask_colors = []
     if labels.shape[0] > 0:
         if mask_color is None:
@@ -161,9 +161,10 @@ def imshow_det_bboxes(img,
             mask = segms[i].astype(bool)
             img[mask] = img[mask] * 0.5 + color_mask * 0.5
 
-    #plt.imshow(img)
-    print("saving")
-    plt.imsave('Result/out%d.png')
+        plt.imshow(img)
+        print("saving")
+        out_file = str(i)+'.jpg'
+        plt.imsave(out_file, img)
 
     p = PatchCollection(
         polygons, facecolor='none', edgecolors=color, linewidths=thickness)
@@ -258,19 +259,19 @@ def imshow_gt_det_bboxes(img,
 
     img = mmcv.imread(img)
 
-    img = imshow_det_bboxes(
-        img,
-        annotation['gt_bboxes'],
-        annotation['gt_labels'],
-        gt_masks,
-        class_names=class_names,
-        bbox_color=gt_bbox_color,
-        text_color=gt_text_color,
-        mask_color=gt_mask_color,
-        thickness=thickness,
-        font_size=font_size,
-        win_name=win_name,
-        show=False)
+    # img = imshow_det_bboxes(
+    #     img,
+    #     annotation['gt_bboxes'],
+    #     annotation['gt_labels'],
+    #     gt_masks,
+    #     class_names=class_names,
+    #     bbox_color=gt_bbox_color,
+    #     text_color=gt_text_color,
+    #     mask_color=gt_mask_color,
+    #     thickness=thickness,
+    #     font_size=font_size,
+    #     win_name=win_name,
+    #     show=False)
 
     if isinstance(result, tuple):
         bbox_result, segm_result = result
@@ -291,7 +292,7 @@ def imshow_gt_det_bboxes(img,
         segms = mmcv.concat_list(segm_result)
         segms = mask_util.decode(segms)
         segms = segms.transpose(2, 0, 1)
-
+    print("labels: ", labels)
     img = imshow_det_bboxes(
         img,
         bboxes,
